@@ -1,55 +1,77 @@
+// Package bully defines generic patterns that can be used to create a
+// leader-election system for distributed computing (*). "Leader-election" or the
+// "Bully algorithm" describes the behavior of a system in which N participants
+// ([]bully.Voter) interact with a shared medium (bully.Forum) to determine which
+// among them is most fit for being in charge. A dynamically assigned, but static
+// and unique, identifier is used to determine the fitness of the each Voter.
+// Each Voter must ensure they are registered with the shared Forum and send all
+// the others a message indicating its intention to be elected. The Voter with
+// the highest unique identifier becomes the leader and sends a message to all
+// others on the Forum to indicate that it won.
+//
+// The implementations provided offer one path for implementing this on your own,
+// however it isn't recommended to mix and match bully.Voter instances, as they
+// could potentially act differently. The name of the game is redundancy
+// and stability. The more Voters are added to the pool, the more potential for
+// stability. Keep in mind that for certain applications of the leader-election
+// system, ensuring bully.Forum redundancy can be just as important.
+//
+// (*) References can be found here: https://en.wikipedia.org/wiki/Bully_algorithm
 package bully
 
 import "time"
 
-type Forum interface {
-	// Open establishes a connection with a remote platform, through which voters
-	// may communicate.
-	Open() error
-	// IsOpen return the current state of the connection.
-	IsOpen() bool
-	// Send sends a message to the provided connection.
-	Send(i interface{}) error
-	// Close the connection.
-	Close() error
-}
-
-type Voter interface {
-	// Elect sends a message to the forum of all other voters, voting for the voter
-	// with the highest id.
-	Elect() error
-	// Ping sends a message to the forum of all other voters, indicating that it is
-	// still alive.
-	Ping() error
-	// Register sends a message to the forum of all other voters, only upon first
-	// start up.
-	Register() error
-	// Id returns the unique id for the voter.
-	Id() int64
-	// SetId assigns the provided unique id to the voter.
-	SetId(id int64) error
-	// Term returns the time-to-live for the voter. This number may not be the same
-	// for all voters, since environments may vary.
-	Term() time.Duration
-	// SetTerm assigns the provided time-to-live to the voter.
-	SetTerm(d time.Duration) error
-	// Forum returns a connector that will handle the sending of messages for the voter.
-	Forum() Forum
-	// SetForum assigns the provided connector, for sending messages, to the voter.
-	SetForum(f Forum) error
-}
-
-func NewId() int64 {
+func NewTimestampId() int64 {
 	return time.Now().UnixNano()
 }
 
-type Process struct {
-	id       int64
+var _ Voter = &Bully{}
+
+type Bully struct {
+	// Id maintains the current identifier of the Bully. This should not change after
+	// the first registration request, unless there was a conflict with another
+	// bully's identifier.
+	id int64
+	// isLeader maintains the current election state of the Bully.
 	isLeader bool
-	term     time.Duration
-	forum    Forum
+	// term indicates the time to live for the Bully. Each time the Bully makes a
+	// Ping request, its timer is reset on the Forum.
+	term  time.Duration
+	forum Forum
 }
 
-func (p *Process) Elect() {
+func (b *Bully) Elect() error {
+	panic("implement me")
+}
 
+func (b *Bully) Ping() error {
+	panic("implement me")
+}
+
+func (b *Bully) Register() error {
+	panic("implement me")
+}
+
+func (b *Bully) Id() interface{} {
+	panic("implement me")
+}
+
+func (b *Bully) SetId(i interface{}) error {
+	panic("implement me")
+}
+
+func (b *Bully) Term() time.Duration {
+	panic("implement me")
+}
+
+func (b *Bully) SetTerm(d time.Duration) error {
+	panic("implement me")
+}
+
+func (b *Bully) Forum() Forum {
+	panic("implement me")
+}
+
+func (b *Bully) SetForum(f Forum) error {
+	panic("implement me")
 }
