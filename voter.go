@@ -1,6 +1,14 @@
-package bully
+package election
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrFailedPing  = errors.New("failed to ping")
+	ErrFailedElect = errors.New("failed to elect")
+)
 
 type Voter interface {
 	// Elect sends a message to the forum of all other voters, voting for the voter
@@ -9,9 +17,6 @@ type Voter interface {
 	// Ping sends a message to the forum of all other voters, indicating that it is
 	// still alive.
 	Ping() error
-	// Register sends a message to the forum of all other voters, only upon first
-	// start up.
-	Register() error
 	// Id returns the unique id for the voter.
 	Id() interface{}
 	// SetId assigns the provided unique id to the voter.
